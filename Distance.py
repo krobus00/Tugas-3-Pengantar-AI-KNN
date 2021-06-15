@@ -29,9 +29,15 @@ class Distance:
         for _, row in self.df.iterrows():
             rowResult = 0
             for col_name in list(self.df.columns)[1:]:
-                rowResult += (row[col_name] - self.test[col_name]) ** p
-            result.append((rowResult ** 1/p))
+                rowResult += abs(row[col_name] - self.test[col_name]) ** p
+            result.append((rowResult ** (1/p)))
         return result
 
     def Supremum(self):
-        pass
+        result = []
+        for _, row in self.df.iterrows():
+            rowResult = []
+            for col_name in list(self.df.columns)[1:]:
+                rowResult.append(abs(row[col_name] - self.test[col_name]))
+            result.append(max(rowResult))
+        return result

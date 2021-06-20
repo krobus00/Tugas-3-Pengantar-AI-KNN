@@ -1,28 +1,30 @@
-from Distance import Distance
 import pandas as pd
 from Distance import Distance
 
 
-def getTop3(l):
-    li = []
-    for i in range(len(l)):
-        li.append([l[i], i])
-    li.sort()
-    sort_index = []
-    for x in li:
-        sort_index.append(x[1])
-    return sort_index[:3]
-
-
-def getResult(df, d):
+def getResult(df, distanceResult):
+    result = []
+    for idx, val in enumerate(distanceResult):
+        result.append([val, df['Nama Mobil'][idx]])
+    result.sort(key=lambda x: x[0])
     no = 1
-    for i in getTop3(d):
-        print('{}. {}'.format(no, df.iloc[i]['Nama Mobil'], d[i]))
+    for data in result[:3]:
+        print('{}. {} {}'.format(no, data[1], data[0]))
         no += 1
+    return result[:3]
+
+
+def saveData(allDistanceResult):
+    col = ['Euclidean', 'Manhattan', 'Minkowski', 'Supremum']
+    row = [[], [], []]
+    for model in allDistanceResult:
+        for i in range(3):
+            row[i].append(model[i][1])
+    pd.DataFrame(row, columns=col).to_excel(
+        'rekomendasi.xls', engine='openpyxl', index=False)
 
 
 df = pd.read_excel('./data/mobil.xls')
-
 print("INPUT")
 ukuran = float(input("ukuran: "))
 kenyamanan = float(input("kenyamanan: "))
@@ -30,26 +32,18 @@ irit = float(input("irit: "))
 kecepatan = float(input("kecepatan: "))
 harga = float(input("harga: "))
 
-test = {
-    'Ukuran': ukuran,
-    'Kenyamanan': kenyamanan,
-    'Irit': irit,
-    'Kecepatan': kecepatan,
-    'Harga (Ratus Juta)': harga
-}
+col = ['Ukuran', 'Kenyamanan', 'Irit', 'Kecepatan',
+       'Harga (Ratus Juta)']
+val = [[ukuran, kenyamanan, irit, kecepatan, harga]]
+dfTest = pd.DataFrame(val, columns=col)
 
-d = Distance(df, test)
-e = d.Euclidean()
-ma = d.Manhattan()
-mi = d.Minkowski()
-s = d.Supremum()
-
-print("RESULT: ")
-print("Euclidean : ")
-getResult(df, e)
-print("Manhattan : ")
-getResult(df,  ma)
-print("Minkowski : ")
-getResult(df, mi)
-print("Supremum : ")
-getResult(df, s)
+d = Distance(df, dfTest)
+result = d.getAllDistance()
+print("RESULT")
+val = []
+for model in result:
+    print("-"*17)
+    print(model)
+    val.append(getResult(df, result[model]))
+    print("-"*17)
+saveData(val)

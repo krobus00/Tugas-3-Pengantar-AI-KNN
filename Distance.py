@@ -4,7 +4,7 @@ import math
 class Distance:
     def __init__(self, df, test):
         self.df = df
-        self.test = test
+        self.test = test.iloc[0]
 
     def Euclidean(self):
         result = []
@@ -24,7 +24,7 @@ class Distance:
             result.append(rowResult)
         return result
 
-    def Minkowski(self, p=2):
+    def Minkowski(self, p=1.5):
         result = []
         for _, row in self.df.iterrows():
             rowResult = 0
@@ -41,3 +41,11 @@ class Distance:
                 rowResult.append(abs(row[col_name] - self.test[col_name]))
             result.append(max(rowResult))
         return result
+
+    def getAllDistance(self):
+        return {
+            'Euclidean': self.Euclidean(),
+            'Manhattan': self.Manhattan(),
+            'Minkowski': self.Minkowski(),
+            'Supremum': self.Supremum()
+        }

@@ -2,6 +2,15 @@ import pandas as pd
 from Distance import Distance
 
 
+def normalize(df, column):
+    result = df.copy()
+    for col in column:
+        max_value = df[col].max()
+        min_value = df[col].min()
+        result[col] = ((df[col] - min_value) / (max_value - min_value))
+    return result
+
+
 def getResult(df, distanceResult):
     result = []
     for idx, val in enumerate(distanceResult):
@@ -25,6 +34,9 @@ def saveData(allDistanceResult):
 
 
 df = pd.read_excel('./data/mobil.xls')
+
+# normalize harga
+df = normalize(df, ['Harga (Ratus Juta)'])
 print("INPUT")
 ukuran = float(input("ukuran: "))
 kenyamanan = float(input("kenyamanan: "))

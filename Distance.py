@@ -5,41 +5,35 @@ class Distance:
     def __init__(self, df, test):
         self.df = df
         self.test = test.iloc[0]
+        # drop non numeric data
+        self.df = df._get_numeric_data()
 
     def Euclidean(self):
         result = []
         for _, row in self.df.iterrows():
-            rowResult = 0
-            for col_name in list(self.df.columns)[1:]:
-                rowResult += (row[col_name] - self.test[col_name]) ** 2
+            rowResult = sum((row - self.test) ** 2)
             result.append((math.sqrt(rowResult)))
         return result
 
     def Manhattan(self):
         result = []
         for _, row in self.df.iterrows():
-            rowResult = 0
-            for col_name in list(self.df.columns)[1:]:
-                rowResult += abs(row[col_name] - self.test[col_name])
+            rowResult = sum(abs(row - self.test))
             result.append(rowResult)
         return result
 
     def Minkowski(self, p=1.5):
         result = []
         for _, row in self.df.iterrows():
-            rowResult = 0
-            for col_name in list(self.df.columns)[1:]:
-                rowResult += abs(row[col_name] - self.test[col_name]) ** p
+            rowResult = sum(abs(row - self.test) ** p)
             result.append((rowResult ** (1/p)))
         return result
 
     def Supremum(self):
         result = []
         for _, row in self.df.iterrows():
-            rowResult = []
-            for col_name in list(self.df.columns)[1:]:
-                rowResult.append(abs(row[col_name] - self.test[col_name]))
-            result.append(max(rowResult))
+            rowResult = max(abs(row - self.test))
+            result.append((rowResult))
         return result
 
     def getAllDistance(self):

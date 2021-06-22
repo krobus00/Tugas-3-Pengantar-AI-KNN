@@ -2,12 +2,12 @@ import pandas as pd
 from Distance import Distance
 
 
-def normalize(df, column):
+def normalize(df, column, factor=10):
     result = df.copy()
     for col in column:
         max_value = df[col].max()
         min_value = df[col].min()
-        result[col] = ((df[col] - min_value) / (max_value - min_value))
+        result[col] = ((df[col] - min_value) / (max_value - min_value))*factor
     return result
 
 
@@ -18,7 +18,7 @@ def getResult(df, distanceResult):
     result.sort(key=lambda x: x[0])
     no = 1
     for data in result[:3]:
-        print('{}. {} {}'.format(no, data[1], data[0]))
+        print('{}. {} {}'.format(no, data[1], round(data[0], 4)))
         no += 1
     return result[:3]
 
@@ -30,7 +30,10 @@ def saveData(allDistanceResult):
         for i in range(3):
             row[i].append(model[i][1])
     pd.DataFrame(row, columns=col).to_excel(
-        'rekomendasi.xls', engine='openpyxl', index=False)
+        'rekomendasi.xls',
+        engine='openpyxl',
+        index=False
+    )
 
 
 df = pd.read_excel('./data/mobil.xls')

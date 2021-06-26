@@ -11,35 +11,33 @@ def normalize(df, column, factor=10):
     return result
 
 
-def getResult(df, distanceResult):
+def getResult(df, distanceResult, k):
     result = []
     for idx, val in enumerate(distanceResult):
         result.append([val, df['Nama Mobil'][idx]])
     result.sort(key=lambda x: x[0])
     no = 1
-    for data in result[:3]:
+    for data in result[:k]:
         print('{}. {} {}'.format(no, data[1], round(data[0], 4)))
         no += 1
-    return result[:3]
+    return result[:k]
 
 
-def saveData(allDistanceResult):
-    col = ['Euclidean', 'Manhattan', 'Minkowski', 'Supremum']
-    row = [[], [], []]
-    for model in allDistanceResult:
-        for i in range(3):
-            row[i].append(model[i][1])
-    pd.DataFrame(row, columns=col).to_excel(
-        'rekomendasi.xls',
+def saveData(result, model):
+    row = []
+    for car in result:
+        row.append(car[1])
+    pd.DataFrame(row, columns=['Rekomendasi']).to_excel(
+        'rekomendasi_{}.xls'.format(model),
         engine='openpyxl',
         index=False
     )
 
 
 df = pd.read_excel('./data/mobil.xls')
+# normalisasi seluruh data
+df = normalize(df, df.columns.values[1:])
 
-# normalize harga
-df = normalize(df, ['Harga (Ratus Juta)'])
 print("INPUT")
 ukuran = float(input("ukuran: "))
 kenyamanan = float(input("kenyamanan: "))
@@ -47,18 +45,21 @@ irit = float(input("irit: "))
 kecepatan = float(input("kecepatan: "))
 harga = float(input("harga: "))
 
+# membuat data test
 col = ['Ukuran', 'Kenyamanan', 'Irit', 'Kecepatan',
        'Harga (Ratus Juta)']
 val = [[ukuran, kenyamanan, irit, kecepatan, harga]]
 dfTest = pd.DataFrame(val, columns=col)
 
+# mengambil hasil pemrosesan data
 d = Distance(df, dfTest)
 result = d.getAllDistance()
+
 print("RESULT")
-val = []
+# Menampilkan hasil dari setiap model distance
 for model in result:
     print("-"*17)
     print(model)
-    val.append(getResult(df, result[model]))
     print("-"*17)
-saveData(val)
+    best = getResult(df, result[model], 3)
+    saveData(best, model)
